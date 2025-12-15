@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "extends": "/Users/richardwoollcott/.agentecflow/templates/fastapi-python",
+  "extends": "~/.agentecflow/templates/fastapi-python",
   "project": {
     "name": "fastapi-auth",
     "template": "fastapi-python",

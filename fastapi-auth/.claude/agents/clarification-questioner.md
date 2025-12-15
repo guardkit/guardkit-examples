@@ -42,10 +42,7 @@ Use these patterns to execute clarification based on context.
 ### Execute Review Scope Clarification (Context A)
 
 ```python
-import sys
-sys.path.insert(0, '/Users/richardwoollcott/.agentecflow/lib')
-sys.path.insert(0, '/Users/richardwoollcott/Projects/appmilla_github/guardkit/installer/core/commands/lib')
-
+# GuardKit clarification module (loaded via ~/.agentecflow/lib)
 from clarification.core import ClarificationMode, ClarificationContext, should_clarify
 from clarification.generators.review_generator import generate_review_questions
 from clarification.display import collect_full_responses, collect_quick_responses, create_skip_context
@@ -313,10 +310,7 @@ clarification_context:
 ### Main Execution Flow
 
 ```python
-import sys
-sys.path.insert(0, '/Users/richardwoollcott/.agentecflow/lib')
-sys.path.insert(0, '/Users/richardwoollcott/Projects/appmilla_github/guardkit/installer/core/commands/lib')
-
+# GuardKit clarification module (loaded via ~/.agentecflow/lib)
 from pathlib import Path
 from clarification.core import (
     ClarificationContext,
