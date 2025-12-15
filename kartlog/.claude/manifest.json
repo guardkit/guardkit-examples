@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.0.0",
+  "name": "kartlog",
+  "display_name": "Javascript Client Side Mvc With Backend As A Service (Firebase)",
+  "description": "JavaScript template using Client-Side MVC with Backend-as-a-Service (Firebase) architecture with Svelte 5.35.5, Firebase 10.14.1 (Auth, Firestore)",
+  "version": "1.0.0",
+  "author": "Richard Woollcott",
+  "language": "JavaScript",
+  "language_version": null,
+  "frameworks": [
+    {
+      "name": "Svelte 5.35.5",
+      "version": null,
+      "purpose": "ui"
+    },
+    {
+      "name": "Firebase 10.14.1 (Auth, Firestore)",
+      "version": null,
+      "purpose": "core"
+    },
+    {
+      "name": "Vite 7.0.4",
+      "version": null,
+      "purpose": "core"
+    },
+    {
+      "name": "SMUI (Svelte Material UI) 8.0.3",
+      "version": null,
+      "purpose": "ui"
+    },
+    {
+      "name": "svelte-spa-router 4.0.1",
+      "version": null,
+      "purpose": "ui"
+    },
+    {
+      "name": "pytest",
+      "version": null,
+      "purpose": "testing"
+    },
+    {
+      "name": "deepeval (LLM testing)",
+      "version": null,
+      "purpose": "testing"
+    }
+  ],
+  "architecture": "Client-Side MVC with Backend-as-a-Service (Firebase)",
+  "patterns": [
+    "Adapter (localStorage for mock data)",
+    "Facade (chat.js wraps OpenAI complexity)",
+    "Function Calling (OpenAI integration)",
+    "Mock/Stub (firestore-mock for testing)",
+    "Module Pattern (centralized firebase.js)",
+    "Observer (Firestore real-time listeners)",
+    "Repository (Firestore data access modules)",
+    "Service Layer (lib/firestore/* modules)",
+    "Store Pattern (Svelte stores for state)",
+    "Strategy (mock vs. real Firebase)"
+  ],
+  "layers": [
+    "Presentation",
+    "Service Layer",
+    "State Management",
+    "Infrastructure",
+    "Utilities"
+  ],
+  "placeholders": {
+    "ProjectName": {
+      "name": "{{ProjectName}}",
+      "description": "Name of the project/solution",
+      "default_value": null,
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+      "required": true
+    },
+    "Namespace": {
+      "name": "{{Namespace}}",
+      "description": "Root namespace for the project",
+      "default_value": null,
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$",
+      "required": true
+    },
+    "Author": {
+      "name": "{{Author}}",
+      "description": "Project author name",
+      "default_value": "Richard Woollcott",
+      "pattern": null,
+      "required": false
+    }
+  },
+  "tags": [
+    "adapter-(localstorage-for-mock-data)",
+    "client-side-mvc-with-backend-as-a-service-(firebase)",
+    "deepeval-(llm-testing)",
+    "facade-(chat.js-wraps-openai-complexity)",
+    "firebase-10.14.1-(auth,-firestore)",
+    "function-calling-(openai-integration)",
+    "infrastructure",
+    "javascript",
+    "mock/stub-(firestore-mock-for-testing)",
+    "module-pattern-(centralized-firebase.js)",
+    "observer-(firestore-real-time-listeners)",
+    "presentation",
+    "pytest",
+    "repository-(firestore-data-access-modules)",
+    "service layer",
+    "service-layer-(lib/firestore/*-modules)",
+    "smui-(svelte-material-ui)-8.0.3",
+    "state management",
+    "store-pattern-(svelte-stores-for-state)",
+    "strategy-(mock-vs.-real-firebase)",
+    "svelte-5.35.5",
+    "svelte-spa-router-4.0.1",
+    "utilities",
+    "vite-7.0.4"
+  ],
+  "category": "frontend",
+  "complexity": 10,
+  "compatible_with": [],
+  "requires": [],
+  "created_at": "2025-12-15T15:31:16.145803",
+  "source_project": "/Users/richardwoollcott/Projects/appmilla_github/guardkit-examples/kartlog",
+  "confidence_score": 94.33
+}
