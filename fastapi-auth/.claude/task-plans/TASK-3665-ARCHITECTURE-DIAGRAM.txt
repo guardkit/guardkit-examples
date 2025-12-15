@@ -1,0 +1,371 @@
+TASK-3665: JWT Authentication Architecture Diagram
+===================================================
+
+1. DATA FLOW - Login Request
+──────────────────────────────────────────────────────────────
+
+Client                     FastAPI App                    Database
+  │                             │                            │
+  ├─ POST /auth/login ──────────▶ OAuth2PasswordBearer       │
+  │  (email, password)           │ extracts credentials      │
+  │                              │                            │
+  │                         router.py                         │
+  │                        /login endpoint                    │
+  │                              │                            │
+  │                         service.py                        │
+  │                    authenticate_user()                    │
+  │                              │                            │
+  │                         user_crud.get_by_email()  ──────▶│
+  │                              │                            │
+  │                              │◀─ User(id, email, pwd_hash)
+  │                              │                            │
+  │                         security.py                       │
+  │                    verify_password()                      │
+  │                    (check pwd_hash)                       │
+  │                              │                            │
+  │                         service.py                        │
+  │                    login_user() - generates tokens        │
+  │                              │                            │
+  │                         security.py                       │
+  │                    create_access_token()                  │
+  │                    create_refresh_token()                 │
+  │                              │                            │
+  │◀────── Token {access, refresh, bearer} ─────────────────│
+  │
+  └─ Save tokens locally
+
+
+2. DATA FLOW - Protected Route Request
+──────────────────────────────────────────────────────────────
+
+Client                     FastAPI App                    Database
+  │                             │                            │
+  ├─ GET /users/me ────────────▶ oauth2_scheme               │
+  │  Header:                    │ extracts token from        │
+  │  Authorization:             │ Authorization header       │
+  │  Bearer eyJ...              │                            │
+  │                        dependencies.py                    │
+  │                    get_current_user()                    │
+  │                              │                            │
+  │                         security.py                       │
+  │                      decode_token()                       │
+  │                    (validates JWT signature,              │
+  │                     checks expiry, returns                │
+  │                     TokenPayload)                         │
+  │                              │                            │
+  │                         user_crud.get()  ───────────────▶│
+  │                              │                            │
+  │                              │◀─ User(id, email, ...)
+  │                              │                            │
+  │                    ✓ Returns User object                  │
+  │                              │                            │
+  │                         router.py                         │
+  │                    /users/me endpoint                     │
+  │                    (receives User object)                 │
+  │                              │                            │
+  │◀────── UserPublic {id, email, name, is_active} ────────│
+  │
+
+
+3. MODULE DEPENDENCY GRAPH
+──────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────┐
+│ main.py                                                     │
+│ ┌────────────────────────────────────────────────────────┐ │
+│ │ - Register auth router                                 │ │
+│ │ - Include dependencies middleware                      │ │
+│ └────────────────────────────────────────────────────────┘ │
+└──────────────────┬──────────────────────────────────────────┘
+                   │
+                   ▼
+        ┌──────────────────────┐
+        │ router.py            │
+        │ /api/v1/auth/*       │
+        │ ├─ POST /login       │
+        │ ├─ POST /refresh     │
+        │ └─ POST /logout      │
+        └──────────┬───────────┘
+                   │
+      ┌────────────┴────────────┐
+      ▼                         ▼
+   service.py           dependencies.py
+   ├─ authenticate()    ├─ get_current_user()
+   ├─ login_user()      ├─ get_current_active_user()
+   └─ refresh_token()   └─ oauth2_scheme
+      │                    │
+      └────────┬───────────┘
+               ▼
+          security.py
+          ├─ verify_password()
+          ├─ get_password_hash()
+          ├─ create_access_token()
+          ├─ create_refresh_token()
+          └─ decode_token()
+
+Optional support:
+      ▼
+  exceptions.py       schemas.py       config.py
+  (custom errors)     (Pydantic)       (settings)
+
+
+4. REQUEST VALIDATION PIPELINE
+──────────────────────────────────────────────────────────────
+
+HTTP Request
+    │
+    ├─ OAuth2PasswordBearer (for token endpoints)
+    │  or OAuth2PasswordRequestForm
+    │
+    ▼
+Pydantic Model Validation
+    │
+    ├─ TokenRefresh schema validation
+    │  or OAuth2PasswordRequestForm validation
+    │
+    ▼
+Dependency Injection
+    │
+    ├─ get_db: AsyncSession from database pool
+    │
+    ├─ get_current_user: Validates JWT token
+    │  ├─ extract token from header
+    │  ├─ decode JWT (security.py)
+    │  ├─ lookup user (user_crud.py)
+    │  └─ return User or raise 401
+    │
+    └─ get_current_active_user: Checks user.is_active
+       └─ return User or raise 403
+    │
+    ▼
+Route Handler
+    │
+    ├─ All dependencies satisfied
+    ├─ All validations passed
+    └─ Execute business logic
+    │
+    ▼
+Response Serialization
+    │
+    ├─ Token (for login/refresh)
+    │  or UserPublic (for /users/me)
+    │  or 204 No Content (for logout)
+    │
+    ▼
+HTTP Response
+
+
+5. SECURITY ARCHITECTURE
+──────────────────────────────────────────────────────────────
+
+Credentials
+    │
+    └─────────────┬──────────────────┐
+                  ▼                  ▼
+            Bcrypt Hash         Plaintext
+            (stored in DB)      (in request)
+                  │                  │
+                  └──────────┬───────┘
+                             ▼
+                    verify_password()
+                    └─ True / False
+
+User Authentication
+    │
+    └─ User(id, email, hashed_password)
+       │
+       ├─ verify_password(request.password, user.password_hash)
+       │  └─ Returns True or False
+       │
+       ▼
+Token Generation
+    │
+    ├─ create_access_token(user.id)
+    │  └─ JWT(sub=user.id, type="access", exp=now+30min)
+    │
+    └─ create_refresh_token(user.id)
+       └─ JWT(sub=user.id, type="refresh", exp=now+7days)
+
+Token Validation (on protected routes)
+    │
+    ├─ Extract token from Authorization header
+    │
+    ├─ decode_token(token)
+    │  ├─ Verify JWT signature (SECRET_KEY)
+    │  ├─ Check exp claim (not expired)
+    │  ├─ Check type claim (correct token type)
+    │  └─ Return TokenPayload or None
+    │
+    └─ If valid: lookup user, return User object
+       If invalid: raise 401 Unauthorized
+
+
+6. COMPONENT INTERACTION MATRIX
+──────────────────────────────────────────────────────────────
+
+Component         | Uses                    | Used By
+──────────────────┼─────────────────────────┼─────────────────
+router.py         | service.py              | main.py
+                  | dependencies.py         |
+                  | exceptions.py           |
+                  | schemas.py              |
+──────────────────┼─────────────────────────┼─────────────────
+service.py        | security.py             | router.py
+                  | user_crud.py            |
+                  | exceptions.py           |
+                  | config.py               |
+──────────────────┼─────────────────────────┼─────────────────
+dependencies.py   | security.py             | router.py
+                  | user_crud.py            | (decorators)
+                  | database.py             |
+                  | exceptions.py           |
+                  | config.py               |
+──────────────────┼─────────────────────────┼─────────────────
+security.py       | config.py               | service.py
+                  | (datetime, jose,        | dependencies.py
+                  |  passlib libs)          | tests/
+──────────────────┼─────────────────────────┼─────────────────
+exceptions.py     | (none)                  | service.py
+                  |                         | dependencies.py
+                  |                         | router.py
+──────────────────┼─────────────────────────┼─────────────────
+schemas.py        | (pydantic)              | router.py
+                  |                         | tests/
+──────────────────┼─────────────────────────┼─────────────────
+config.py         | (pydantic)              | service.py
+                  | (os.getenv)             | security.py
+                  |                         | dependencies.py
+──────────────────┼─────────────────────────┼─────────────────
+user_crud.py      | (existing SQLAlchemy)   | service.py
+                  |                         | dependencies.py
+                  |                         | tests/
+──────────────────┼─────────────────────────┼─────────────────
+database.py       | (existing SQLAlchemy)   | dependencies.py
+                  |                         | service.py
+──────────────────┼─────────────────────────┼─────────────────
+tests/            | All above (mocking)     | (pytest)
+
+
+7. TOKEN STRUCTURE
+──────────────────────────────────────────────────────────────
+
+Access Token:
+┌────────────────────────────────────────────────────────────┐
+│ JWT Encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.......│
+└─────────────────────┬──────────────────────────────────────┘
+                      │
+    Decoded Payload:
+    {
+      "sub": "1",                    // User ID
+      "type": "access",              // Token type
+      "exp": 1702656030,             // Expiration (unix timestamp)
+      "iat": 1702654230,             // Issued at
+      "jti": "unique-token-id-xyz"   // Unique token ID
+    }
+
+Refresh Token:
+┌────────────────────────────────────────────────────────────┐
+│ JWT Encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.......│
+└─────────────────────┬──────────────────────────────────────┘
+                      │
+    Decoded Payload:
+    {
+      "sub": "1",                    // User ID
+      "type": "refresh",             // Token type
+      "exp": 1702999999,             // Expiration (7 days out)
+      "iat": 1702654230,             // Issued at
+      "jti": "unique-token-id-abc"   // Unique token ID
+    }
+
+
+8. ERROR RESPONSE CODES & MEANINGS
+──────────────────────────────────────────────────────────────
+
+401 Unauthorized (Invalid/Missing Token)
+  ├─ Missing Authorization header
+  ├─ Malformed token (not valid JWT)
+  ├─ Invalid signature (wrong SECRET_KEY)
+  ├─ Token expired
+  ├─ User not found (deleted after token issued)
+  └─ Wrong token type (e.g., refresh when access needed)
+
+403 Forbidden (User Inactive)
+  ├─ User account disabled (is_active=False)
+  └─ User soft-deleted
+
+429 Too Many Requests (Rate Limited)
+  ├─ >5 login attempts in 15 minutes
+  └─ Retry-After header indicates wait time
+
+400 Bad Request (Invalid Input)
+  ├─ Missing password field
+  ├─ Invalid email format
+  └─ Malformed refresh token request
+
+
+9. DEPLOYMENT CHECKLIST
+──────────────────────────────────────────────────────────────
+
+Before deploying to production:
+
+Security:
+  ☐ SECRET_KEY is random, ≥32 chars, stored securely
+  ☐ HTTPS enabled (tokens only transmitted over HTTPS)
+  ☐ Passwords never logged or exposed in errors
+  ☐ BCRYPT_ROUNDS ≥ 12 (cost factor)
+  ☐ No hardcoded secrets in code
+
+Configuration:
+  ☐ Environment variables properly set
+  ☐ .env file in .gitignore
+  ☐ Access token expiry reasonable (30 min - 2 hours)
+  ☐ Refresh token expiry reasonable (7-30 days)
+
+Performance:
+  ☐ Database connection pooling configured
+  ☐ Rate limiting configured appropriately
+  ☐ Token decoding is fast (<5ms)
+  ☐ Password hashing doesn't timeout API
+
+Monitoring:
+  ☐ Login failures logged (for security)
+  ☐ Rate limit violations logged
+  ☐ Invalid token attempts tracked
+  ☐ Alerting configured for suspicious patterns
+
+Testing:
+  ☐ All auth tests passing
+  ☐ Coverage ≥85%
+  ☐ Async/await patterns verified
+  ☐ Load testing done (concurrent logins)
+
+
+10. FUTURE ENHANCEMENTS
+──────────────────────────────────────────────────────────────
+
+Phase 2 (Add Token Blacklist):
+  ├─ Redis cache for invalidated tokens
+  ├─ logout endpoint adds token to blacklist
+  └─ decode_token checks blacklist
+
+Phase 3 (Add Refresh Token Rotation):
+  ├─ New refresh token issued with each access token refresh
+  ├─ Old refresh token invalidated
+  └─ Prevent token replay attacks
+
+Phase 4 (Add Two-Factor Auth):
+  ├─ TOTP/SMS verification after password
+  ├─ Separate verification endpoint
+  └─ Longer-lived pre-auth token
+
+Phase 5 (OAuth2/OpenID Connect):
+  ├─ Google/GitHub/Microsoft sign-in
+  ├─ Third-party provider token exchange
+  └─ Scope-based authorization
+
+Phase 6 (Role-Based Access Control):
+  ├─ User.roles field
+  ├─ Dependency: get_current_admin_user
+  └─ Endpoint authorization by role
+
+═══════════════════════════════════════════════════════════════
