@@ -5,6 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   return {
+  test: {
+    environment: 'happy-dom',
+    globals: true
+  },
   plugins: [
     svelte(),
     VitePWA({
