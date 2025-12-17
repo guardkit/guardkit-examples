@@ -22,6 +22,9 @@
   import EditChassis from './routes/EditChassis.svelte';
   import Chat from './routes/Chat.svelte';
   import Navigation from './components/Navigation.svelte';
+  import PackTemplates from './routes/PackTemplates.svelte';
+  import NewPackTemplate from './routes/NewPackTemplate.svelte';
+  import EditPackTemplate from './routes/EditPackTemplate.svelte';
 
   import Marketing from './routes/marketing.svelte';
   import { location } from 'svelte-spa-router';
@@ -47,6 +50,9 @@
     '/tracks': Tracks,
     '/tracks/new': NewTrack,
     '/tracks/:id': EditTrack,
+    '/templates': PackTemplates,
+    '/templates/new': NewPackTemplate,
+    '/templates/:id/edit': EditPackTemplate,
     '/chat': Chat
   };
 
