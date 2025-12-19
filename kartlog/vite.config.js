@@ -7,10 +7,17 @@ export default defineConfig(({ mode }) => {
   return {
   test: {
     environment: 'happy-dom',
-    globals: true
+    globals: true,
+    browser: {
+      enabled: false
+    }
   },
   plugins: [
-    svelte(),
+    svelte({
+      compilerOptions: {
+        hydratable: true
+      }
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['vite.svg'],
