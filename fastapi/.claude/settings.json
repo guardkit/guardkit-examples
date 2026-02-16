@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "extends": "~/.agentecflow/templates/fastapi-python",
+  "project": {
+    "name": "fastapi",
+    "template": "fastapi-python",
+    "detected_type": "unknown",
+    "created": "2026-02-16T14:23:10Z"
+  },
+  "methodology": {
+    "requirements": "EARS",
+    "testing": "BDD",
+    "documentation": "ADR"
+  },
+  "quality": {
+    "coverage": 80,
+    "complexity": 10,
+    "gates": true
+  }
+}

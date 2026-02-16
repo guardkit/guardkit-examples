@@ -1,0 +1,57 @@
+id: FEAT-F97F
+name: Create FastAPI app with health endpoint
+description: Initial FastAPI application with health check endpoint, project foundation,
+  testing infrastructure, and dev tooling. No auth.
+created: '2026-02-16T14:33:27.998184'
+status: planned
+complexity: 3
+estimated_tasks: 4
+tasks:
+- id: TASK-HLTH-001
+  name: Create project foundation
+  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-001-create-project-foundation.md
+  complexity: 3
+  dependencies: []
+  status: pending
+  description: ''
+  implementation_mode: direct
+  estimated_minutes: 33
+- id: TASK-HLTH-002
+  name: Implement health endpoint
+  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-002-implement-health-endpoint.md
+  complexity: 2
+  dependencies:
+  - TASK-HLTH-001
+  status: pending
+  description: ''
+  implementation_mode: direct
+  estimated_minutes: 22
+- id: TASK-HLTH-003
+  name: Set up testing infrastructure and health tests
+  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-003-set-up-testing-infrastructure-and-health-tests.md
+  complexity: 2
+  dependencies:
+  - TASK-HLTH-001
+  - TASK-HLTH-002
+  status: pending
+  description: ''
+  implementation_mode: direct
+  estimated_minutes: 22
+- id: TASK-HLTH-004
+  name: Add dev tooling configuration
+  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-004-add-dev-tooling-configuration.md
+  complexity: 2
+  dependencies:
+  - TASK-HLTH-001
+  status: pending
+  description: ''
+  implementation_mode: direct
+  estimated_minutes: 22
+orchestration:
+  parallel_groups:
+  - - TASK-HLTH-001
+  - - TASK-HLTH-002
+    - TASK-HLTH-004
+  - - TASK-HLTH-003
+  estimated_duration_minutes: 99
+  recommended_parallel: 2

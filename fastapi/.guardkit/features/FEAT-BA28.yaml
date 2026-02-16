@@ -1,0 +1,68 @@
+id: FEAT-BA28
+name: PostgreSQL Database Integration
+description: Add PostgreSQL database integration using SQLAlchemy async with connection
+  pooling, health check integration, and a sample users table with CRUD endpoints
+created: '2026-02-16T15:41:24.919420'
+status: planned
+complexity: 6
+estimated_tasks: 5
+tasks:
+- id: TASK-DB-001
+  name: Set up database infrastructure
+  file_path: tasks/backlog/postgresql-database-integration/TASK-DB-001-setup-database-infrastructure.md
+  complexity: 6
+  dependencies: []
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 113
+- id: TASK-DB-002
+  name: Configure Alembic migrations and create users table
+  file_path: tasks/backlog/postgresql-database-integration/TASK-DB-002-configure-alembic-migrations.md
+  complexity: 5
+  dependencies:
+  - TASK-DB-001
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 75
+- id: TASK-DB-003
+  name: Implement User model schemas and CRUD
+  file_path: tasks/backlog/postgresql-database-integration/TASK-DB-003-implement-user-model-schemas-crud.md
+  complexity: 5
+  dependencies:
+  - TASK-DB-001
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 75
+- id: TASK-DB-004
+  name: Create Users CRUD API endpoints and health check
+  file_path: tasks/backlog/postgresql-database-integration/TASK-DB-004-create-users-api-endpoints-health-check.md
+  complexity: 6
+  dependencies:
+  - TASK-DB-002
+  - TASK-DB-003
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 113
+- id: TASK-DB-005
+  name: Add database integration tests
+  file_path: tasks/backlog/postgresql-database-integration/TASK-DB-005-add-database-tests.md
+  complexity: 5
+  dependencies:
+  - TASK-DB-004
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 75
+orchestration:
+  parallel_groups:
+  - - TASK-DB-001
+  - - TASK-DB-002
+    - TASK-DB-003
+  - - TASK-DB-004
+  - - TASK-DB-005
+  estimated_duration_minutes: 451
+  recommended_parallel: 2

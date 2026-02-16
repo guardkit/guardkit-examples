@@ -1,0 +1,69 @@
+id: FEAT-AAC2
+name: Add comprehensive API documentation
+description: Centralized OpenAPI configuration with Swagger UI, ReDoc, schema customization,
+  API versioning headers, and response examples
+created: '2026-02-16T14:42:42.040235'
+status: planned
+complexity: 4
+estimated_tasks: 5
+tasks:
+- id: TASK-DOCS-001
+  name: Add documentation settings
+  file_path: tasks/backlog/api-documentation/TASK-DOCS-001-add-documentation-settings.md
+  complexity: 2
+  dependencies: []
+  status: pending
+  description: ''
+  implementation_mode: direct
+  estimated_minutes: 22
+- id: TASK-DOCS-002
+  name: Create OpenAPI schema customization
+  file_path: tasks/backlog/api-documentation/TASK-DOCS-002-create-openapi-customization.md
+  complexity: 4
+  dependencies:
+  - TASK-DOCS-001
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 50
+- id: TASK-DOCS-003
+  name: Add API versioning middleware
+  file_path: tasks/backlog/api-documentation/TASK-DOCS-003-add-versioning-middleware.md
+  complexity: 3
+  dependencies:
+  - TASK-DOCS-001
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 33
+- id: TASK-DOCS-004
+  name: Add response examples to schemas
+  file_path: tasks/backlog/api-documentation/TASK-DOCS-004-add-response-examples.md
+  complexity: 3
+  dependencies:
+  - TASK-DOCS-001
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 33
+- id: TASK-DOCS-005
+  name: Add documentation and versioning tests
+  file_path: tasks/backlog/api-documentation/TASK-DOCS-005-add-documentation-tests.md
+  complexity: 3
+  dependencies:
+  - TASK-DOCS-002
+  - TASK-DOCS-003
+  - TASK-DOCS-004
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 33
+orchestration:
+  parallel_groups:
+  - - TASK-DOCS-001
+  - - TASK-DOCS-002
+    - TASK-DOCS-003
+    - TASK-DOCS-004
+  - - TASK-DOCS-005
+  estimated_duration_minutes: 171
+  recommended_parallel: 3

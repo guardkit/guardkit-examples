@@ -1,0 +1,70 @@
+id: FEAT-CC79
+name: Structured JSON Logging
+description: 'Implement structured JSON logging with structlog: request correlation
+  IDs via contextvars, middleware for request/response logging, per-environment log
+  levels and rendering'
+created: '2026-02-16T14:54:18.104145'
+status: planned
+complexity: 5
+estimated_tasks: 5
+tasks:
+- id: TASK-LOG-001
+  name: Create logging configuration module
+  file_path: tasks/backlog/structured-json-logging/TASK-LOG-001-create-logging-configuration.md
+  complexity: 4
+  dependencies: []
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 50
+- id: TASK-LOG-003
+  name: Create logging settings configuration
+  file_path: tasks/backlog/structured-json-logging/TASK-LOG-003-create-logging-settings.md
+  complexity: 3
+  dependencies: []
+  status: pending
+  description: ''
+  implementation_mode: direct
+  estimated_minutes: 33
+- id: TASK-LOG-002
+  name: Create correlation ID middleware
+  file_path: tasks/backlog/structured-json-logging/TASK-LOG-002-create-correlation-id-middleware.md
+  complexity: 5
+  dependencies:
+  - TASK-LOG-001
+  - TASK-LOG-003
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 75
+- id: TASK-LOG-004
+  name: Integrate logging with FastAPI app
+  file_path: tasks/backlog/structured-json-logging/TASK-LOG-004-integrate-with-fastapi-app.md
+  complexity: 3
+  dependencies:
+  - TASK-LOG-001
+  - TASK-LOG-002
+  - TASK-LOG-003
+  status: pending
+  description: ''
+  implementation_mode: direct
+  estimated_minutes: 33
+- id: TASK-LOG-005
+  name: Add logging tests
+  file_path: tasks/backlog/structured-json-logging/TASK-LOG-005-add-logging-tests.md
+  complexity: 4
+  dependencies:
+  - TASK-LOG-004
+  status: pending
+  description: ''
+  implementation_mode: task-work
+  estimated_minutes: 50
+orchestration:
+  parallel_groups:
+  - - TASK-LOG-001
+    - TASK-LOG-003
+  - - TASK-LOG-002
+  - - TASK-LOG-004
+  - - TASK-LOG-005
+  estimated_duration_minutes: 241
+  recommended_parallel: 2

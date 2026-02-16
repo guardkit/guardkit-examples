@@ -1,0 +1,59 @@
+"""
+Database Session Management
+
+This module configures SQLAlchemy async engine and session factory.
+"""
+
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+
+from src.core.config import settings
+
+# Create async engine with connection pooling
+engine = create_async_engine(
+    str(settings.DATABASE_URL),
+    echo=settings.DEBUG,  # Log SQL queries in debug mode
+    future=True,
+    pool_pre_ping=True,  # Verify connections before using
+    pool_size=10,  # Number of connections to maintain
+    max_overflow=20,  # Additional connections when pool is exhausted
+)
+
+# Create async session factory
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,  # Don't expire objects after commit
+    autocommit=False,  # Manual transaction control
+    autoflush=False,  # Manual flush control
+)
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Dependency that provides auto-committing database session.
+
+    Usage:
+        async def endpoint(db: AsyncSession = Depends(get_db)):
+            obj = await crud.create(db, data)
+            # Changes auto-committed when endpoint succeeds
+            # Auto-rolled back if exception raised
+
+    For multiple operations in one transaction:
+        async def endpoint(db: AsyncSession = Depends(get_db)):
+            obj1 = await crud.create(db, data1)
+            obj2 = await crud.create(db, data2)
+            # BOTH committed atomically on success
+
+    Yields:
+        AsyncSession: Database session with auto-commit/rollback
+    """
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()  # Auto-commit on success
+        except Exception:
+            await session.rollback()  # Rollback on error
+            raise
+        finally:
+            await session.close()
