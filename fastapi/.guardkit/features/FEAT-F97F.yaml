@@ -28,7 +28,7 @@ tasks:
   estimated_minutes: 22
 - id: TASK-HLTH-003
   name: Set up testing infrastructure and health tests
-  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-003-set-up-testing-infrastructure-and-health-tests.md
+  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-003-setup-testing-infrastructure.md
   complexity: 2
   dependencies:
   - TASK-HLTH-001
@@ -39,7 +39,7 @@ tasks:
   estimated_minutes: 22
 - id: TASK-HLTH-004
   name: Add dev tooling configuration
-  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-004-add-dev-tooling-configuration.md
+  file_path: tasks/backlog/fastapi-health-app/TASK-HLTH-004-add-dev-tooling-config.md
   complexity: 2
   dependencies:
   - TASK-HLTH-001
